@@ -1,0 +1,80 @@
+# ------------------------------
+# Python
+# ------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Virtual Environment
+venv/
+.env/
+.venv/
+env/
+
+# Environment Variables
+.env
+.env.*
+
+# SQLite Database
+*.db
+*.sqlite3
+soc.db
+
+# Logs
+*.log
+
+# Pytest / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# ------------------------------
+# Node / React Frontend
+# ------------------------------
+node_modules/
+frontend/node_modules/
+
+dist/
+frontend/dist/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vite
+frontend/.vite/
+
+# ------------------------------
+# Secrets / API Keys
+# ------------------------------
+*.pem
+*.key
+credentials.json
+token.json
+
+# ------------------------------
+# n8n Local Files (optional)
+# ------------------------------
+.n8n/
+
+# ------------------------------
+# Misc
+# ------------------------------
+*.tmp
+*.bak
