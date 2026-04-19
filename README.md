@@ -1,162 +1,271 @@
 # 🛡️ AI SOC Analyst
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688.svg)
+![React](https://img.shields.io/badge/React-Frontend-61DAFB.svg)
+![Open Source](https://img.shields.io/badge/Open%20Source-Yes-orange.svg)
 
-AI-powered Security Operations Center (SOC) platform that detects anomalous network activity using Machine Learning, analyzes threats using LLMs, and automates incident response workflows using FastAPI and n8n.
+Open-source autonomous AI Security Operations Center platform for anomaly detection, threat analysis, and automated incident response.
+An autonomous AI-powered Security Operations Center (SOC) platform built to detect suspicious network behavior, analyze cyber threats, automate incident response, and provide live security visibility through a premium dashboard.
 
----
-
-## 🚀 Features
-
-* 🔍 Real-time anomaly detection using Isolation Forest
-* 🤖 AI threat analysis using LLMs
-* ⚡ Automated incident response workflows with n8n
-* 📩 Gmail alert escalation for critical threats
-* 🗄️ SQLite database for alert storage
-* 📊 Alerts API for dashboard integration
-* 🔐 SOC-inspired cybersecurity architecture
+This project combines Machine Learning, LLM intelligence, automation workflows, and frontend monitoring into one modern cybersecurity system.
 
 ---
 
-## 🏗️ Architecture
+# 🚀 Key Features
 
-```text
-Incoming Logs
-   ↓
-ML Anomaly Detection
-   ↓
-AI Threat Analysis
-   ↓
-FastAPI Backend
-   ↓
-n8n Webhook Automation
-   ↓
-Risk Decision Engine
-   ↓
-Email Alert / Response Action
-```
+## 🔍 AI + ML Threat Detection
+
+* Detects suspicious traffic using Isolation Forest anomaly detection
+* Feature-engineered detection pipeline using:
+
+  * packet size
+  * duration
+  * protocol behavior
+  * internal vs external traffic
+  * long session indicators
+  * large packet indicators
+
+## 🧠 AI Threat Analysis
+
+* Uses OpenAI to analyze serious anomalies
+* Generates:
+
+  * attack type
+  * threat reasoning
+  * severity level
+  * recommended response actions
+
+## 💰 Cost Optimized LLM Usage
+
+* OpenAI is triggered only for high-confidence anomalies
+* Low confidence alerts use local rule-based analysis
+* Reduces API spend while keeping intelligence quality high
+
+## ⚡ Automated Response
+
+* Integrated with n8n workflows
+* Sends Gmail alerts for critical incidents
+* Supports future automation actions like ticketing / blocking IPs
+
+## 📊 Premium SOC Dashboard
+
+* Real-time alerts monitoring
+* Confidence Gauge
+* Risk distribution charts
+* Threat timeline
+* Attack type analytics
+* Threat intelligence panels
+* Live threat feed
+
+## 🗄️ Alert Storage
+
+* SQLite database stores:
+
+  * source IP
+  * destination IP
+  * protocol
+  * anomaly confidence
+  * threat classification
+  * response actions
+  * timestamps
 
 ---
 
-## 🧠 Tech Stack
+# 🧱 Tech Stack
 
-### Backend
+## Backend
 
 * FastAPI
 * Python
 * SQLAlchemy
 * SQLite
 
-### AI / ML
+## Machine Learning
 
 * Scikit-learn
 * Isolation Forest
-* OpenAI API
+* StandardScaler
+* Feature Engineering
 
-### Automation
+## AI Layer
+
+* OpenAI API (`gpt-4.1-mini`)
+
+## Automation
 
 * n8n
 * Gmail API
 
-### Frontend (Planned / Optional)
+## Frontend
 
 * React
+* Vite
 * Tailwind CSS
+* Recharts
+* Framer Motion
+* Lucide Icons
 
 ---
 
-## 📂 Project Structure
+# 🧠 Detection Workflow
 
 ```text
-app/
-├── main.py
-├── database.py
-├── routes/
-├── models/
-└── services/
-
-ml/
-frontend/
+Incoming Log
+→ Preprocessing
+→ ML Anomaly Detection
+→ Confidence Score
+→ If High Confidence:
+      OpenAI Threat Analysis
+→ Save Alert
+→ Trigger Automation
+→ Display on Dashboard
 ```
 
 ---
 
-## ⚙️ Installation
+# 📦 API Endpoints
+
+## POST `/log`
+
+Send network log for analysis.
+
+### Example Request
+
+```json
+{
+  "src_ip": "103.143.66.244",
+  "dst_ip": "10.0.0.5",
+  "protocol": "UDP",
+  "packet_size": 6976,
+  "duration": 22
+}
+```
+
+### Example Response
+
+```json
+{
+  "prediction": "anomaly",
+  "confidence": 73,
+  "analysis": {
+    "attack_type": "UDP Flood",
+    "reason": "Large UDP packets with extended duration indicate possible flooding behavior.",
+    "risk": "High",
+    "action": "Block source IP and monitor traffic."
+  }
+}
+```
+
+---
+
+## GET `/alerts`
+
+Returns stored alerts for dashboard.
+
+---
+
+# 💻 Run Locally
+
+## Backend
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
-cd YOUR_REPO
+git clone https://github.com/kartavya0203/Ai-socAnalyst.git
+cd Ai-socAnalyst
+
+python -m venv venv
+venv\Scripts\activate
+
 pip install -r requirements.txt
+
 uvicorn app.main:app --reload
 ```
 
 ---
 
-## 🔐 Environment Variables
+## Frontend
 
-Create a `.env` file in the root folder:
+```bash
+cd frontend
+
+npm install
+npm run dev
+```
+
+---
+
+# 🔐 Environment Variables
+
+Create `.env`
 
 ```env
-OPENAI_API_KEY=your_openai_api_key
+OPENAI_API_KEY=your_openai_key_here
 ```
 
 ---
 
-## 📡 API Endpoints
+# 🧪 Testing
 
-### POST `/log`
+Includes traffic simulator for realistic SOC scenarios:
 
-Send a network log for anomaly detection and AI threat analysis.
-
-#### Example Request
-
-```json
-{
-  "src_ip": "192.168.1.1",
-  "dst_ip": "10.0.0.5",
-  "protocol": "TCP",
-  "packet_size": 5000,
-  "duration": 15
-}
-```
+* Normal internal traffic
+* Port scanning
+* DDoS style traffic
+* Large suspicious transfers
+* Mixed anomaly bursts
 
 ---
 
-### GET `/alerts`
+# 📈 Current Version
 
-Fetch all stored security alerts.
+## v1.5
 
----
+### Completed
 
-## 📩 Example Alert Output
+* ML anomaly engine upgraded
+* Confidence scoring added
+* Cost-optimized AI analysis
+* Premium dashboard completed
+* Database schema upgraded
+* Real traffic testing completed
 
-```json
-{
-  "src_ip": "192.168.1.1",
-  "risk": "High",
-  "attack_type": "Possible DDoS",
-  "reason": "Large packet size and abnormal session duration",
-  "action": "Block IP and notify admin"
-}
-```
+### Planned Next
 
----
-
-## 🎯 Future Improvements
-
-* 📊 Live React SOC Dashboard
-* 💬 Slack / Teams Alerts
-* 🐘 PostgreSQL Migration
-* 🐳 Docker Deployment
-* 🔥 Real Firewall API Integration
-* 📈 Threat Analytics Charts
+* Threat Intelligence APIs (AbuseIPDB / VirusTotal)
+* Live WebSocket alerts
+* JWT Authentication
+* Multi-user analyst roles
+* MITRE ATT&CK mapping
+* Deployment
 
 ---
 
-## 👨‍💻 Author
+# 🎯 Why This Project Matters
 
-Built by Kartavya
+Security teams face alert fatigue and slow manual investigations.
+
+AI SOC Analyst explores how autonomous systems can:
+
+* reduce analyst workload
+* prioritize threats
+* automate response
+* improve visibility
+* scale security operations
 
 ---
 
-## 📜 License
+# 👨‍💻 Author
 
-MIT License
+Kartavya
+
+---
+
+# ⭐ If you like this project
+
+Star the repo and connect with me.
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
