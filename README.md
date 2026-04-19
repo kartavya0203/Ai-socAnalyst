@@ -8,6 +8,10 @@
 Open-source autonomous AI Security Operations Center platform for anomaly detection, threat analysis, and automated incident response.
 An autonomous AI-powered Security Operations Center (SOC) platform built to detect suspicious network behavior, analyze cyber threats, automate incident response, and provide live security visibility through a premium dashboard.
 
+## Dashboard Preview
+
+![Dashboard](screenshots/Screenshot 2026-04-19 172014.png)
+
 This project combines Machine Learning, LLM intelligence, automation workflows, and frontend monitoring into one modern cybersecurity system.
 
 ---
