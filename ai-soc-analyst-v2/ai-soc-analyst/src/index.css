@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #0B0F19;
+    color: #CBD5E1;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(99,120,155,0.25); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(99,120,155,0.45); }
+}
+
+@layer components {
+  .glass {
+    background: rgba(17,24,39,0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .card {
+    background: #111827;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .pill-high   { background: rgba(239,68,68,0.12);  color: #F87171; border: 1px solid rgba(239,68,68,0.3);   font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 99px; letter-spacing:.04em; display:inline-block; }
+  .pill-medium { background: rgba(245,158,11,0.12); color: #FCD34D; border: 1px solid rgba(245,158,11,0.3);  font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 99px; letter-spacing:.04em; display:inline-block; }
+  .pill-low    { background: rgba(16,185,129,0.12); color: #34D399; border: 1px solid rgba(16,185,129,0.3);  font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 99px; letter-spacing:.04em; display:inline-block; }
+  .label-xs    { font-size: 11px; font-weight: 500; color: #475569; letter-spacing: .08em; text-transform: uppercase; }
+  .mono        { font-family: 'JetBrains Mono', monospace; }
+
+  .sidebar-item {
+    display: flex; align-items: center; gap: 11px; padding: 9px 12px;
+    border-radius: 10px; font-size: 13.5px; font-weight: 500; color: #64748B;
+    cursor: pointer; transition: all .18s; white-space: nowrap;
+  }
+  .sidebar-item:hover { color: #CBD5E1; background: rgba(255,255,255,0.04); }
+  .sidebar-item.active { color: #F1F5F9; background: rgba(59,130,246,0.12); border-left: 2px solid #3B82F6; margin-left: -2px; padding-left: 14px; }
+  .sidebar-item.active svg { color: #3B82F6; }
+
+  .input-base {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 8px 14px; font-size: 13px; color: #CBD5E1;
+    outline: none; font-family: 'Inter', sans-serif; transition: border-color .2s;
+  }
+  .input-base:focus { border-color: rgba(59,130,246,0.4); }
+  .input-base::placeholder { color: #475569; }
+
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: #475569; letter-spacing:.08em; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .data-table td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); color: #94A3B8; font-size: 13px; vertical-align: middle; }
+  .data-table tbody tr { cursor: pointer; transition: background .15s; }
+  .data-table tbody tr:hover td { background: rgba(59,130,246,0.04); }
+
+  @keyframes shimmer {
+    0% { background-position: -600px 0; }
+    100% { background-position: 600px 0; }
+  }
+  .skeleton {
+    background: linear-gradient(90deg,#1E293B 25%,#263348 50%,#1E293B 75%);
+    background-size: 1200px 100%; animation: shimmer 1.8s infinite linear; border-radius: 8px;
+  }
+
+  @keyframes live-pulse {
+    0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(16,185,129,0.4); }
+    50% { opacity:.7; box-shadow:0 0 0 4px rgba(16,185,129,0); }
+  }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:#10B981; animation: live-pulse 2s infinite; }
+
+  @keyframes feed-slide {
+    from { opacity:0; transform: translateX(10px); }
+    to   { opacity:1; transform: translateX(0); }
+  }
+  .feed-entry { animation: feed-slide 0.35s ease-out both; }
+}
