@@ -16,7 +16,10 @@ router = APIRouter()
 def receive_log(log: Log):
 
     processed = preprocess_log(log)
-    prediction = predict_log(processed)
+    ml_result = predict_log(processed)
+
+    prediction = ml_result["prediction"]
+    confidence = ml_result["confidence"]
 
     ai_analysis = None
 
@@ -45,9 +48,10 @@ def receive_log(log: Log):
         trigger_automation(log, ai_analysis)
 
     return {
-        "prediction": prediction,
-        "analysis": ai_analysis
-    }
+    "prediction": prediction,
+    "confidence": confidence,
+    "analysis": ai_analysis
+}
 
 @router.get("/alerts")
 def get_alerts():

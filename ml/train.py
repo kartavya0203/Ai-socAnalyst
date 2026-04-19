@@ -1,17 +1,47 @@
-# ml/train.py
-
 import pandas as pd
+import random
+
 from model import AnomalyDetector
 
-# Create dummy dataset (you can replace later)
-data = pd.DataFrame({
-    "packet_size": [100, 200, 150, 3000, 5000],
-    "duration": [1, 2, 1.5, 10, 12]
-})
 
+# --------------------------
+# Generate Normal Traffic
+# --------------------------
+def normal_row():
+    protocol = random.choice([1, 2])  # TCP / UDP
+
+    return {
+        "packet_size": random.randint(100, 1400),
+        "duration": random.randint(1, 5),
+        "protocol": protocol,
+        "src_external": 0,
+        "dst_external": 0,
+        "internal_lateral": 1,
+        "large_packet": 0,
+        "long_duration": 0
+    }
+
+
+# --------------------------
+# Create Dataset
+# --------------------------
+rows = []
+
+for _ in range(5000):
+    rows.append(normal_row())
+
+df = pd.DataFrame(rows)
+
+
+# --------------------------
+# Train Model
+# --------------------------
 detector = AnomalyDetector()
-detector.train(data)
+
+detector.train(df)
 
 detector.save()
 
-print("Model trained and saved")
+print("✅ New anomaly model trained and saved.")
+print("Rows used:", len(df))
+print("Columns:", list(df.columns))
