@@ -29,12 +29,19 @@ def receive_log(log: Log):
 
         db = SessionLocal()
 
+        # app/routes/logs.py
+
         new_alert = Alert(
             src_ip=log.src_ip,
             dst_ip=log.dst_ip,
+
             protocol=log.protocol,
             packet_size=log.packet_size,
             duration=log.duration,
+
+            prediction=prediction,     # NEW
+            confidence=confidence,     # NEW
+
             attack_type=ai_analysis["attack_type"],
             reason=ai_analysis["reason"],
             risk=ai_analysis["risk"],
