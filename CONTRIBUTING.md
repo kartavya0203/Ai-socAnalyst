@@ -1,4 +1,3 @@
-````markdown
 # Contributing to AI SOC Analyst
 
 Thank you for your interest in contributing to **AI SOC Analyst**.  
@@ -131,6 +130,3 @@ If you identify a security issue, please responsibly disclose it instead of publ
 # 🙌 Thank You
 
 Your contributions help improve **AI SOC Analyst** and make cybersecurity tooling more accessible to everyone.
-
-```
-```
