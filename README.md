@@ -10,7 +10,7 @@ An autonomous AI-powered Security Operations Center (SOC) platform built to dete
 
 ## Dashboard Preview
 
-![Dashboard](screenshots/Screenshot 2026-04-19 172014.png)
+![Dashboard](screenshots/dashboard.png)
 
 This project combines Machine Learning, LLM intelligence, automation workflows, and frontend monitoring into one modern cybersecurity system.
 
