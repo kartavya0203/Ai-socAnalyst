@@ -12,10 +12,18 @@ from app.models.alert_model import Alert
 
 router = APIRouter()
 
+
 @router.post("/log")
 def receive_log(log: Log):
 
+    # -----------------------------
+    # Step 1: Preprocess input log
+    # -----------------------------
     processed = preprocess_log(log)
+
+    # -----------------------------
+    # Step 2: ML Prediction
+    # -----------------------------
     ml_result = predict_log(processed)
 
     prediction = ml_result["prediction"]
@@ -23,48 +31,77 @@ def receive_log(log: Log):
 
     ai_analysis = None
 
+    # -----------------------------
+    # Step 3: If anomaly detected
+    # -----------------------------
     if prediction == "anomaly":
 
-        ai_analysis = analyze_alert(log, prediction)
+        # Cost optimization:
+        # Use OpenAI only for high confidence threats
+        if confidence >= 60:
+            ai_analysis = analyze_alert(log, prediction)
 
+        # Low confidence anomalies handled locally
+        else:
+            ai_analysis = {
+                "attack_type": "Suspicious Activity",
+                "reason": "Anomalous traffic pattern detected by ML engine.",
+                "risk": "Medium",
+                "action": "Monitor source IP and investigate if repeated."
+            }
+
+        # -----------------------------
+        # Step 4: Save alert in DB
+        # -----------------------------
         db = SessionLocal()
 
-        # app/routes/logs.py
+        try:
+            new_alert = Alert(
+                src_ip=log.src_ip,
+                dst_ip=log.dst_ip,
 
-        new_alert = Alert(
-            src_ip=log.src_ip,
-            dst_ip=log.dst_ip,
+                protocol=log.protocol,
+                packet_size=log.packet_size,
+                duration=log.duration,
 
-            protocol=log.protocol,
-            packet_size=log.packet_size,
-            duration=log.duration,
+                prediction=prediction,
+                confidence=confidence,
 
-            prediction=prediction,     # NEW
-            confidence=confidence,     # NEW
+                attack_type=ai_analysis["attack_type"],
+                reason=ai_analysis["reason"],
+                risk=ai_analysis["risk"],
+                action=ai_analysis["action"]
+            )
 
-            attack_type=ai_analysis["attack_type"],
-            reason=ai_analysis["reason"],
-            risk=ai_analysis["risk"],
-            action=ai_analysis["action"]
-        )
+            db.add(new_alert)
+            db.commit()
 
-        db.add(new_alert)
-        db.commit()
-        db.close()
+        finally:
+            db.close()
 
+        # -----------------------------
+        # Step 5: Trigger Automation
+        # -----------------------------
         trigger_automation(log, ai_analysis)
 
+    # -----------------------------
+    # Step 6: API Response
+    # -----------------------------
     return {
-    "prediction": prediction,
-    "confidence": confidence,
-    "analysis": ai_analysis
-}
+        "prediction": prediction,
+        "confidence": confidence,
+        "analysis": ai_analysis
+    }
+
 
 @router.get("/alerts")
 def get_alerts():
 
     db = SessionLocal()
-    alerts = db.query(Alert).all()
-    db.close()
 
-    return alerts
+    try:
+        alerts = db.query(Alert).all()
+        return alerts
+
+    finally:
+        db.close()
