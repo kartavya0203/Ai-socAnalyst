@@ -1,5 +1,11 @@
 # 🛡️ AI SOC Analyst
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688.svg)
+![React](https://img.shields.io/badge/React-Frontend-61DAFB.svg)
+![Open Source](https://img.shields.io/badge/Open%20Source-Yes-orange.svg)
 
+Open-source autonomous AI Security Operations Center platform for anomaly detection, threat analysis, and automated incident response.
 An autonomous AI-powered Security Operations Center (SOC) platform built to detect suspicious network behavior, analyze cyber threats, automate incident response, and provide live security visibility through a premium dashboard.
 
 This project combines Machine Learning, LLM intelligence, automation workflows, and frontend monitoring into one modern cybersecurity system.
