@@ -49,12 +49,10 @@ export default function Navbar({ alertCount, refreshing, onRefresh }) {
         {/* Live status */}
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg"
           style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.18)' }}>
-          <motion.div
-            className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0"
-            animate={{ opacity: [1, 0.3, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-          <span className="text-[11px] font-semibold text-emerald-400" style={{ letterSpacing: '.06em' }}>LIVE</span>
+          <div className="flex items-center gap-2 text-green-400 text-sm">
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-ping" />
+            LIVE
+          </div>
           <span className="text-[11px] text-slate-500">{alertCount} events</span>
         </div>
 

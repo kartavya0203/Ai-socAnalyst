@@ -240,10 +240,50 @@ export default function App() {
   }, [])
 
   useEffect(() => { loadAlerts(false) }, [loadAlerts])
+  // Polling disabled - using WebSocket for real-time updates only
+  // useEffect(() => {
+  //   const t = setInterval(() => loadAlerts(true), REFRESH_MS)
+  //   return () => clearInterval(t)
+  // }, [loadAlerts])
+
+  // WebSocket listener for real-time alerts
   useEffect(() => {
-    const t = setInterval(() => loadAlerts(true), REFRESH_MS)
-    return () => clearInterval(t)
-  }, [loadAlerts])
+    const ws = new WebSocket('ws://127.0.0.1:8000/ws/alerts')
+    const audio = new Audio('/alert.mp3')
+
+    ws.onopen = () => {
+      console.log('✅ WS CONNECTED')
+    }
+
+    ws.onmessage = (event) => {
+      try {
+        const newAlert = JSON.parse(event.data)
+        console.log('📡 WS MESSAGE:', newAlert)
+        // Fire alert sound (ignore autoplay errors)
+        try { audio.play().catch(() => { }) } catch (e) { }
+        // Ensure confidence is a number
+        newAlert.confidence = Number(newAlert.confidence ?? 0)
+        // Prepend new alert to the list
+        setAlerts(prev => [newAlert, ...prev])
+      } catch (err) {
+        console.error('❌ Failed to parse alert:', err)
+      }
+    }
+
+    ws.onerror = (error) => {
+      console.error('❌ WS ERROR:', error)
+    }
+
+    ws.onclose = () => {
+      console.log('❌ WS CLOSED')
+    }
+
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close()
+      }
+    }
+  }, [])
 
   if (loading) return <LoadingScreen />
   if (error && alerts.length === 0) return <ErrorScreen message={error} onRetry={() => loadAlerts(false)} />

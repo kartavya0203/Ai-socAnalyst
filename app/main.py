@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from app.database import Base, engine
 from app.routes.logs import router
+from app.routes import ws
 from fastapi.middleware.cors import CORSMiddleware
 Base.metadata.create_all(bind=engine)
 
@@ -16,3 +17,4 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(ws.router)

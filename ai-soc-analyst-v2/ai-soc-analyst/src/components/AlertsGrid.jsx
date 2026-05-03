@@ -1,4 +1,4 @@
-import { Fragment, useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react'
 
@@ -201,9 +201,9 @@ export default function AlertsGrid({ alerts }) {
           <tbody>
             {rows.length === 0 ? (
               <tr><td colSpan={COLS.length + 1} className="py-12 text-center text-slate-600 text-[13px]">No matching alerts</td></tr>
-            ) : rows.map(alert => (
-              <Fragment key={alert.id}>
-                <tr className="hover:bg-white/5 transition cursor-pointer" onClick={() => setExpanded(expanded === alert.id ? null : alert.id)}>
+            ) : rows.map((alert, index) => (
+              <motion.tbody key={alert.id} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} style={{ display: 'contents' }}>
+                <tr className={`hover:bg-white/5 transition cursor-pointer ${index === 0 ? 'bg-red-500/5 border-l-2 border-red-500' : ''}`} onClick={() => setExpanded(expanded === alert.id ? null : alert.id)}>
                   <td><ThreatBadge alert={alert} /></td>
                   <td>
                     <div className="flex items-center gap-2">
@@ -300,7 +300,7 @@ export default function AlertsGrid({ alerts }) {
                     </motion.tr>
                   )}
                 </AnimatePresence>
-              </Fragment>
+              </motion.tbody>
             ))}
           </tbody>
         </table>

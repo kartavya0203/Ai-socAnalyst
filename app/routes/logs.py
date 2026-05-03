@@ -1,5 +1,6 @@
 # app/routes/logs.py
 
+import asyncio
 from fastapi import APIRouter
 from app.models.log_model import Log
 from app.services.processor import preprocess_log
@@ -11,12 +12,13 @@ from app.database import SessionLocal
 from app.models.alert_model import Alert
 # from app.services.threat_intel import get_basic_intel
 from app.services.threat_intel import get_threat_intel
+from app.routes.ws import broadcast_alert
 
 router = APIRouter()
 
 
 @router.post("/log")
-def receive_log(log: Log):
+async def receive_log(log: Log):
 
     # -----------------------------
     # Step 1: Preprocess input log
@@ -82,6 +84,29 @@ def receive_log(log: Log):
 
             db.add(new_alert)
             db.commit()
+
+            # Broadcast alert to all connected WebSocket clients
+            try:
+                asyncio.create_task(broadcast_alert({
+                "id": new_alert.id,
+                "src_ip": new_alert.src_ip,
+                "dst_ip": new_alert.dst_ip,
+                "protocol": new_alert.protocol,
+                "packet_size": new_alert.packet_size,
+                "duration": new_alert.duration,
+                "confidence": new_alert.confidence,
+                "risk": new_alert.risk,
+                "attack_type": new_alert.attack_type,
+                "reason": new_alert.reason,
+                "action": new_alert.action,
+                "country": new_alert.country,
+                "isp": new_alert.isp,
+                "is_private": new_alert.is_private,
+                "prediction": new_alert.prediction,
+                "created_at": new_alert.created_at.isoformat() if new_alert.created_at else None,
+            }))
+            except Exception as e:
+                print(f"WebSocket broadcast failed: {e}")
 
         finally:
             db.close()

