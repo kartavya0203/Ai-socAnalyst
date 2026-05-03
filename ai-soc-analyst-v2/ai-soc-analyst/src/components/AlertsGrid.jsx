@@ -1,10 +1,32 @@
-import { useState, useMemo } from 'react'
+import { Fragment, useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react'
 
-const RiskPill = ({ risk }) => {
-  const cls = risk === 'High' ? 'pill-high' : risk === 'Medium' ? 'pill-medium' : 'pill-low'
-  return <span className={cls}>{risk}</span>
+const getThreatLevel = (alert) => {
+  if (alert.is_private) return 'LOW'
+
+  if ((alert.confidence ?? 0) >= 70) return 'CRITICAL'
+  if ((alert.confidence ?? 0) >= 55) return 'HIGH'
+  if ((alert.confidence ?? 0) >= 40) return 'MEDIUM'
+
+  return 'LOW'
+}
+
+const ThreatBadge = ({ alert }) => {
+  const level = getThreatLevel(alert)
+
+  const styles = {
+    CRITICAL: 'bg-red-600 text-white',
+    HIGH: 'bg-orange-500 text-white',
+    MEDIUM: 'bg-yellow-400 text-black',
+    LOW: 'bg-green-500 text-white',
+  }
+
+  return (
+    <span className={`px-2 py-1 rounded text-[10px] font-bold ${styles[level]}`}>
+      {level}
+    </span>
+  )
 }
 
 const PredBadge = ({ prediction }) => {
@@ -45,7 +67,7 @@ const ProtoBadge = ({ proto }) => (
   </span>
 )
 
-const RISK_ORDER = { High: 0, Medium: 1, Low: 2 }
+const THREAT_ORDER = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 }
 const PAGE_SIZE = 8
 const FILTERS = ['All', 'High', 'Medium', 'Low']
 
@@ -53,6 +75,9 @@ const COLS = [
   { k: 'risk', l: 'Severity', sort: true },
   { k: 'src_ip', l: 'Source IP', sort: true },
   { k: 'dst_ip', l: 'Dest IP', sort: true },
+  { k: 'country', l: 'Country', sort: true },
+  { k: 'isp', l: 'ISP', sort: false },
+  { k: 'is_private', l: 'Network', sort: true },
   { k: 'protocol', l: 'Proto', sort: true },
   { k: 'packet_size', l: 'Pkt Size', sort: true },
   { k: 'duration', l: 'Duration', sort: true },
@@ -83,7 +108,7 @@ export default function AlertsGrid({ alerts }) {
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
       let va = a[sortKey], vb = b[sortKey]
-      if (sortKey === 'risk') { va = RISK_ORDER[va] ?? 9; vb = RISK_ORDER[vb] ?? 9 }
+      if (sortKey === 'risk') { va = THREAT_ORDER[getThreatLevel(a)] ?? 9; vb = THREAT_ORDER[getThreatLevel(b)] ?? 9 }
       if (typeof va === 'number') return sortDir === 'asc' ? va - vb : vb - va
       va = String(va ?? ''); vb = String(vb ?? '')
       return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
@@ -177,11 +202,36 @@ export default function AlertsGrid({ alerts }) {
             {rows.length === 0 ? (
               <tr><td colSpan={COLS.length + 1} className="py-12 text-center text-slate-600 text-[13px]">No matching alerts</td></tr>
             ) : rows.map(alert => (
-              <>
-                <tr key={alert.id} onClick={() => setExpanded(expanded === alert.id ? null : alert.id)}>
-                  <td><RiskPill risk={alert.risk} /></td>
-                  <td><span className="mono text-[12px] text-blue-400">{alert.src_ip}</span></td>
+              <Fragment key={alert.id}>
+                <tr className="hover:bg-white/5 transition cursor-pointer" onClick={() => setExpanded(expanded === alert.id ? null : alert.id)}>
+                  <td><ThreatBadge alert={alert} /></td>
+                  <td>
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${alert.is_private ? 'bg-green-400' : 'bg-red-400 animate-pulse'}`} />
+                      <div className="flex flex-col">
+                        <span className="mono text-[12px] text-blue-400">{alert.src_ip}</span>
+                        <span className="text-[10px] text-slate-500">{alert.country || '—'} • {alert.isp || '—'}</span>
+                      </div>
+                    </div>
+                  </td>
                   <td><span className="mono text-[12px] text-slate-400">{alert.dst_ip}</span></td>
+                  <td><span className="text-[12px] text-slate-300">{alert.country || '—'}</span></td>
+                  <td>
+                    <span title={alert.isp || ''} className="text-[12px] text-slate-500 truncate max-w-[120px] block">
+                      {alert.isp || '—'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="flex gap-1 flex-wrap">
+                      {alert.is_private ? (
+                        <span className="tag tag-green">Internal</span>
+                      ) : (
+                        <span className="tag tag-red">External</span>
+                      )}
+                      {alert.protocol === 'TCP' && <span className="tag tag-blue">Stateful</span>}
+                      {alert.protocol === 'UDP' && <span className="tag tag-purple">Stateless</span>}
+                    </div>
+                  </td>
                   <td><ProtoBadge proto={alert.protocol} /></td>
                   <td><span className="mono text-[12px]">{(alert.packet_size ?? 0).toLocaleString()}</span></td>
                   <td><span className="mono text-[12px]">{alert.duration ?? 0}s</span></td>
@@ -207,6 +257,23 @@ export default function AlertsGrid({ alerts }) {
                             <div className="text-[12px] text-slate-300 leading-relaxed">{alert.reason || '—'}</div>
                           </div>
                           <div>
+                            <div className="label-xs mb-1">Threat Intelligence</div>
+                            <div className="text-[12px] text-slate-300 leading-relaxed">
+                              🌍 {alert.country || '—'} <br />
+                              🏢 {alert.isp || '—'} <br />
+                              {alert.is_private ? '🏠 Internal Traffic' : '🌐 External Traffic'}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="label-xs mb-1">Threat Summary</div>
+                            <div className="text-[12px] text-slate-300 leading-relaxed">
+                              {alert.is_private
+                                ? 'Internal anomaly detected. Possible lateral movement or misconfiguration.'
+                                : 'External suspicious traffic detected. Potential reconnaissance or attack attempt.'
+                              }
+                            </div>
+                          </div>
+                          <div>
                             <div className="label-xs mb-1">Packet / Duration</div>
                             <div className="mono text-[12px] text-slate-300">{(alert.packet_size || 0).toLocaleString()} B &nbsp;·&nbsp; {alert.duration ?? 0}s</div>
                           </div>
@@ -220,12 +287,20 @@ export default function AlertsGrid({ alerts }) {
                             <div className="label-xs mb-1">Alert ID</div>
                             <div className="mono text-[12px] text-blue-400">#{String(alert.id).padStart(6, '0')}</div>
                           </div>
+                          <div className="sm:col-span-2">
+                            <div className="label-xs mb-1">Quick Actions</div>
+                            <div className="flex gap-2 mt-2 flex-wrap">
+                              <button type="button" className="btn-mini bg-red-600">Block IP</button>
+                              <button type="button" className="btn-mini bg-yellow-500">Investigate</button>
+                              <button type="button" className="btn-mini bg-green-600">Mark Safe</button>
+                            </div>
+                          </div>
                         </div>
                       </td>
                     </motion.tr>
                   )}
                 </AnimatePresence>
-              </>
+              </Fragment>
             ))}
           </tbody>
         </table>

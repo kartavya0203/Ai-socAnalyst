@@ -9,6 +9,8 @@ from app.services.automation_service import trigger_automation
 
 from app.database import SessionLocal
 from app.models.alert_model import Alert
+# from app.services.threat_intel import get_basic_intel
+from app.services.threat_intel import get_threat_intel
 
 router = APIRouter()
 
@@ -35,7 +37,8 @@ def receive_log(log: Log):
     # Step 3: If anomaly detected
     # -----------------------------
     if prediction == "anomaly":
-
+        # Get basic threat intel (cost-effective)
+        intel = get_threat_intel(log.src_ip, confidence)
         # Cost optimization:
         # Use OpenAI only for high confidence threats
         if confidence >= 60:
@@ -57,21 +60,25 @@ def receive_log(log: Log):
 
         try:
             new_alert = Alert(
-                src_ip=log.src_ip,
-                dst_ip=log.dst_ip,
+            src_ip=log.src_ip,
+            dst_ip=log.dst_ip,
+            protocol=log.protocol,
+            packet_size=log.packet_size,
+            duration=log.duration,
 
-                protocol=log.protocol,
-                packet_size=log.packet_size,
-                duration=log.duration,
+            prediction=prediction,
+            confidence=confidence,
 
-                prediction=prediction,
-                confidence=confidence,
+            attack_type=ai_analysis["attack_type"],
+            reason=ai_analysis["reason"],
+            risk=ai_analysis["risk"],
+            action=ai_analysis["action"],
 
-                attack_type=ai_analysis["attack_type"],
-                reason=ai_analysis["reason"],
-                risk=ai_analysis["risk"],
-                action=ai_analysis["action"]
-            )
+            # NEW
+            country=intel["country"],
+            isp=intel["isp"],
+            is_private=intel["is_private"],
+        )
 
             db.add(new_alert)
             db.commit()
